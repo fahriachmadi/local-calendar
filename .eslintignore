@@ -1,0 +1,6 @@
+build/*.js
+config/*.js
+build/*
+src/*.js
+src/*
+// The line below means to include this one file in eslint from the above instruction to ignore the entire dir: 
