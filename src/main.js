@@ -5,6 +5,7 @@ import store from "./store";
 
 require("bootstrap/dist/css/bootstrap.min.css");
 require("bootstrap/dist/js/bootstrap.min.js");
+require("./assets/css/style.css")
 
 Vue.config.productionTip = false;
 
