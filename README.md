@@ -1,10 +1,14 @@
 # calendar2
+Mark your event at current month and year
 
 ### Feature and functionality
-Markup : * Add Event (click the blue button !)
-		 * Show Event Detail (click the green rectangle in date column !)
-		 * Responsive Calendar (Test it for mobile view)
-		 * Save event with localstorage. So, your event still there safely until you closed your browser
+* Add Event (click the blue button !)
+* Show Event Detail (click the green rectangle in date column !)
+* Responsive Calendar (Test it for mobile view)
+* Save event with localstorage. So, your event still there safely until you closed your browser
+* Remove Event
+
+
 
 ## Project setup
 ```
