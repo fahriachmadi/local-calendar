@@ -15,7 +15,7 @@
                 <div class="form-group">
                   <div class="row">
                     <div class="col-sm-3">
-                      <label for="title" >Title</label>
+                      <label for="title">Title</label>
                     </div>
                     <div class="col-sm-8 no-padding">
                       <input class="form-control" v-model="form.title" type="text" placeholder="Event Name" required />
@@ -76,7 +76,7 @@
           <div class="modal-footer">
             <slot name="footer">
               <button type="submit" class="btn btn-primary">Yes</button>
-              <button class="btn btn-danger" @click="close">
+              <button type="reset" class="btn btn-danger" @click="close">
                 Cancel
               </button>
             </slot>
@@ -89,9 +89,6 @@
 </template>
 
 <script>
-
-import bus from '@/service/bus'
-
 export default {
   name: "EventModal",
   props: {
@@ -116,7 +113,8 @@ export default {
   watch:{
     show : function(){
       if(this.show == true) {this.resetForm();}
-    }  
+    }
+
   },
   mounted() {
     this.setTime();
@@ -166,8 +164,8 @@ export default {
       this.form.description = ""
     },
     action(){
-      console.log('form', this.form)
-      bus.$emit('SUBMIT_EVENT', this.form)
+
+      this.$emit('submit', this.form)
       this.close()
     }
   }

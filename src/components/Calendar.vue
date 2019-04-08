@@ -1,25 +1,32 @@
 <template>
-  <div class="calendar">
-    <h1 class="header-title">Local Calendar</h1>
-    
-    <div class="calendar-content">
-      <h3>{{ month + " " + year }}</h3>
-        <div class="row">
-          <div v-for="day in days" class="cal-header col-sm"><span><strong>{{ day }}</strong></span></div>
-        </div>
-        <div class="row" v-for="date in dates">
-          <div @click="addEvent(aDate)" class="cal-cell col-sm" :class="{'font-grey' : !aDate.thisMonth, 'clickable-cell':aDate.thisMonth}" v-for="aDate in date"><span>{{ aDate.day }}</span></div> 
-        </div>
+  <div class="calendar container-fluid">
+    <div class="row">
+      <div class="col-sm-3 header-title">
+        <h1>Local Calendar</h1>
+        <button type="button" @click="showModal=!showModal" class="btn header-title btn-primary">Add Event</button>
+      </div>
+      <div class="col-sm-8 calendar-content">
+        <h4>{{ month + " " + year }}</h4>
+          <div class="row">
+            <div v-for="day in days" class="cal-header col-sm"><span><strong>{{ day }}</strong></span></div>
+          </div>
+          <div class="row" v-for="date in dates">
+            <div class="cal-cell col-sm" :class="{'font-grey' : !aDate.thisMonth}" v-for="aDate in date">
+              <span>{{ aDate.day }}</span>
+              <div @click="showEvent(index)" v-for="(event, index) in listEvent[aDate.day]" v-if="index < 3" class="event-box">{{ event.title }}</div>
+              <div @click="showMore()" v-if="listEvent[aDate.day] != null && listEvent[aDate.day].length > 3">{{(listEvent[aDate.day].length-3) + " more"}}</div>
+            </div> 
+          </div>
+      </div>
     </div>
-    <button type="button" @click="showModal=!showModal" class="btn btn-primary">Add Event</button>
-    <event-modal :show="showModal" @close="showModal=false" @submit=""></event-modal>
+    <event-modal :show="showModal" @close="showModal=false" @submit="submitEvent"></event-modal>
+    <!-- <show-event></show-event> -->
   </div>
 </template>
 
 <script>
 
 import EventModal from "./modal/EventModal.vue" 
-import bus from '@/service/bus'
 
 export default {
   name: "Calendar",
@@ -35,17 +42,9 @@ export default {
       year: "",
       dates: [['', '', '', '', '', '', ''], ['', '', '', '', '', '', ''], ['', '', '', '', '', '', ''], ['', '', '', '', '', '', ''], ['', '', '', '', '', '', '']],
       days: ["SUN","MON", "TUE", "WED", "THU", "FRI", "SAT"],
-      event: {
-        "startTime" : "",
-        "endTime" : "",
-        "title" : "",
-        "desc" : "",
-      },
       listEvent : [],
       event : {}
     };
-  },
-  updated(){
   },
   mounted() {
     let date =  new Date();
@@ -54,16 +53,34 @@ export default {
     let lastDate = new Date(date.getFullYear(), date.getMonth()+1, 0);
     let firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
     this.createDate(date, firstDate, lastDate) 
-
-    bus.$on('SUBMIT_EVENT', (event) => {
-
-        this.listEvent[this.listEvent.length] = event
-                console.log('bus submit', this.listEvent)
-    })
   },
   methods: {
     toggleModal(){
       this.showModal = !this.showModal
+    },
+    submitEvent(event){
+        //make a copy of event, so don't reactive with change in modal
+        let eventSubmitted  = JSON.parse(JSON.stringify(event));
+        
+        let startDate = event.startDate.day
+        let endDate = event.endDate.day
+        console.log('event START DATE END', startDate, endDate)
+        if(startDate != endDate){
+          if(this.listEvent[startDate] == null){
+            this.listEvent[startDate] = []
+          }
+          if(this.listEvent[endDate] == null){
+            this.listEvent[endDate] = []
+          }
+          this.listEvent[startDate].push(eventSubmitted)
+          this.listEvent[endDate].push(eventSubmitted)  
+        }else{
+          console.log('this event', this.listEvent[startDate])
+          if(this.listEvent[startDate] == null){
+            this.listEvent[startDate] = []
+          }
+          this.listEvent[startDate].push(eventSubmitted)
+        }
     },
     month_name: function(dt) {
       let mList = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ];
@@ -119,16 +136,14 @@ export default {
 <style scoped>
 .header-title{
   margin-top: 2%;
+  text-align: left;
 }
 .cal-cell, .cal-header {
   border-right: 1px solid black;
   border-bottom: 1px solid black;
+  text-align: center;
 }
-.clickable-cell:hover {
-  background-color: #e8ebef;
-  cursor: pointer;
-}
-.cal-header span{
+.cal-header > span{
   vertical-align: middle;
   line-height: normal;
   display : inline-block;
@@ -139,8 +154,10 @@ export default {
   border-top : 1px solid black;
 }
 .cal-cell {
-  height: 75px;
+  height: 90px;
   font-size: 14px;
+  display: block;
+  overflow: hidden;
 }
 .cal-cell:nth-child(1), .cal-header:nth-child(1){
   border-left : 1px solid black;
@@ -150,8 +167,17 @@ export default {
   width: 70%;
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
-  font-family: 'Barlow-Medium';
+  font-family: 'Helvetica';
+  text-align: left;
+}
+.event-box {
+  border: 1px solid black;
+  background-color : #0a7f25;
+  color: #ffffff;
+  border-radius: 10px;
+  height: 15px;
+  line-height: 12px;
+  margin-bottom: 1px;
 }
 
 </style>
