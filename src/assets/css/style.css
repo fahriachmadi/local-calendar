@@ -1,3 +1,11 @@
+/*CSS for reusable class styling*/
+
 .font-grey{
   color : #b6bbc4; 
+}
+.cursor-pointer{
+	cursor: pointer;
+}
+.no-padding{
+	padding: 0px;
 }

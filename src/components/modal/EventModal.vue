@@ -4,7 +4,7 @@
       <div class="modal-wrapper">
         <div class="modal-container default" @click.stop>
           <div class="modal-title">
-            <slot name="title">
+            <slot class="col-sm-12 col-xs-12" name="title">
               <h2>Add Event</h2>
             </slot> 
           </div>
@@ -14,36 +14,36 @@
               
                 <div class="form-group">
                   <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-md-3">
                       <label for="title">Title</label>
                     </div>
-                    <div class="col-sm-8 no-padding">
+                    <div class="col-md-8 no-padding">
                       <input class="form-control" v-model="form.title" type="text" placeholder="Event Name" required />
                     </div>
                   </div>                  
                 </div>
                 <div class="form-group">
                   <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-md-3">
                       <label for="title">Description</label>
                     </div>
-                    <div class="col-sm-8 no-padding">
+                    <div class="col-md-8 no-padding">
                       <input class="form-control" v-model="form.description" type="text" placeholder="Description"/>
                     </div>
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-12 col-md-3">
                       <label for="title">Start Time</label>
                     </div>
-                    <div class="col-sm-4 no-padding">
+                    <div class="col-6 col-md-4 no-padding">
                       <select class="custom-select" v-model="form.startDate" required>
                         <option :value="form.startDate" disabled hidden>{{ months[form.startDate.month] + " " + form.startDate.day + ", " + form.startDate.year }}</option>
                         <option v-for="date in dates"  :value="date">{{ months[date.month] + " " + date.day + ", " + date.year }}</option>
                       </select>
                     </div>
-                    <div class="col-sm-2 no-padding">
+                    <div class="col-6 col-md-2 no-padding">
                       <select class="custom-select" v-model="form.startTime" required>
                         <option :value="form.startTime" disabled hidden>{{ form.startTime }}</option>
                         <option v-for="time in times" :value="time">{{ time }}</option>
@@ -53,16 +53,16 @@
                 </div>
                 <div class="form-group">
                   <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-12 col-md-3">
                       <label for="title">End Time</label>
                     </div>
-                    <div class="col-sm-4 no-padding">
+                    <div class="col-6 col-md-4 no-padding">
                       <select class="custom-select" v-model="form.endDate" required>
                         <option :value="form.endDate" disabled hidden>{{ months[form.endDate.month] + " " + form.endDate.day + ", " + form.endDate.year }}</option>
                         <option v-for="date in dates"  :value="date">{{ months[date.month] + " " + date.day + ", " + date.year }}</option>
                       </select>
                     </div>
-                    <div class="col-sm-2 no-padding">
+                    <div class="col-6 col-md-2 no-padding">
                       <select class="custom-select" v-model="form.endTime" required>
                         <option :value="form.endTime" disabled hidden>{{ form.endTime }}</option>
                         <option v-for="time in times" :value="time">{{ time }}</option>
@@ -203,6 +203,16 @@ export default {
       font-family: Helvetica, Arial, sans-serif;
     }
 
+    @media only screen and (max-width: 768px) {
+      .modal-container{
+        width : 400px;
+      }
+    }
+     @media only screen and (max-width: 600px) {
+      .modal-container{
+        width : 300px;
+      }
+    }
     .modal-header h3 {
       margin-top: 0;
       color: #42b983;
@@ -222,15 +232,6 @@ export default {
       text-align : center;
     }
 
-    /*
-     * The following styles are auto-applied to elements with
-     * transition="modal" when their visibility is toggled
-     * by Vue.js.
-     *
-     * You can easily play with the modal transition by editing
-     * these styles.
-     */
-
     .modal-enter {
       opacity: 0;
     }
@@ -243,8 +244,5 @@ export default {
     .modal-leave-active .modal-container {
       -webkit-transform: scale(1.1);
       transform: scale(1.1);
-    }
-    .no-padding{
-      padding: 0px;
     }
 </style>
