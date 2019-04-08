@@ -9,3 +9,8 @@
 .no-padding{
 	padding: 0px;
 }
+
+.btn-grey{
+	background-color: #b6bbc4;
+	color : white;
+}

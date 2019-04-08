@@ -15,8 +15,8 @@
             <div class="cal-cell col-sm" v-if="nowDate != null" :class="{'font-grey' : !(aDate.month == nowDate.getMonth())}" v-for="aDate in date">
               <span class="display-phone">{{ aDate.day + " " + months[aDate.month] }}</span>
               <span class="display-desktop">{{ aDate.day }}</span>
-              <div @click="showEvent(event)" v-for="(event, index) in listEvent[aDate.day]" v-if="index < 3" class="event-box"> {{ event.title }}</div>
-              <a @click="showMore(aDate.day)" href="#" v-if="listEvent[aDate.day] != null && listEvent[aDate.day].length > 3">{{(listEvent[aDate.day].length-3) + " more"}}</a>
+              <div @click="showEvent(event, index)" v-for="(event, index) in listEvent[aDate.day]" v-if="index < LIMIT_EVENT" class="event-box"> {{ event.title }}</div>
+              <a @click="showMore(aDate.day)" href="#" v-if="listEvent[aDate.day] != null && listEvent[aDate.day].length > LIMIT_EVENT">{{(listEvent[aDate.day].length - LIMIT_EVENT) + " more"}}</a>
             </div> 
           </div>
       </div>
@@ -24,10 +24,10 @@
    
 
     <event-modal :show="showModal.addEvent" @close="showModal.addEvent=false" @submit="submitEvent"></event-modal>
-    <show-event-modal :event="event" :show="showModal.viewEvent" @close="showModal.viewEvent=false"></show-event-modal>
+    <show-event-modal :eventIndex="eventIndex" :event="event" :show="showModal.viewEvent" @remove="removeEvent" @close="showModal.viewEvent=false"></show-event-modal>
     <default-modal :show="showModal.defaultModal" @close="showModal.defaultModal=false">
       <h4 slot="title">List Event</h4>
-      <div slot="body" @click="showEvent(event)" v-for="(event, index) in listEvent[selectedMore]" class="event-box"> {{ event.title }}</div>
+      <div slot="body" @click="showEvent(event, index)" v-for="(event, index) in listEvent[selectedMore]" class="event-box"> {{ event.title }}</div>
     </default-modal>
   </div>
 </template>
@@ -37,6 +37,7 @@
 import EventModal from "./modal/EventModal" 
 import ShowEventModal from "./modal/ShowEventModal" 
 import DefaultModal from "./modal/DefaultModal"
+import StorageHelper from "@/helper/storage.js"
 
 export default {
   name: "Calendar",
@@ -60,10 +61,30 @@ export default {
       months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       listEvent : [],
       event : {},
-      selectedMore: null
+      eventIndex : null,
+      selectedMore: null,
+      //constants
+      LIMIT_EVENT : 3,
+      MAX_MONTH_INDEX : 11,
+      MIN_MONTH_INDEX : 0,
+      MAX_COLUMN_INDEX : 6,
+      MAX_ROW_INDEX : 5,
     };
   },
+  // watch: {
+  //   listEvent:{
+  //     handler: function (val) {
+  //       console.log('a thing changed')
+  //       localStorage.setItem('listEvent', JSON.stringify(this.listEvent))
+  //     },
+  //     deep: false
+      
+  //   }
+  // },
   mounted() {
+    if(StorageHelper.getAttribute('listEvent')!=null){
+      this.listEvent = JSON.parse(StorageHelper.getAttribute('listEvent'))
+    }
     this.nowDate =  new Date();
     this.month = this.month_name(this.nowDate.getMonth());
     this.year = this.nowDate.getFullYear();
@@ -81,7 +102,6 @@ export default {
         
         let startDate = event.startDate.day
         let endDate = event.endDate.day
-        console.log('event START DATE END', startDate, endDate)
         if(startDate != endDate){
           if(this.listEvent[startDate] == null){
             this.listEvent[startDate] = []
@@ -92,12 +112,12 @@ export default {
           this.listEvent[startDate].push(eventSubmitted)
           this.listEvent[endDate].push(eventSubmitted)  
         }else{
-          console.log('this event', this.listEvent[startDate])
           if(this.listEvent[startDate] == null){
             this.listEvent[startDate] = []
           }
           this.listEvent[startDate].push(eventSubmitted)
         }
+        localStorage.setItem('listEvent', JSON.stringify(this.listEvent))
     },
     month_name: function(dt) {
       let mList = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ];
@@ -119,11 +139,11 @@ export default {
       }
 
       //6 is max column index in calendar
-      if(lastDate.getDay() != 6){
+      if(lastDate.getDay() != this.MAX_COLUMN_INDEX){
           let dayAfter = 1;
           let lastDay = new Date(date.getFullYear(), date.getMonth()+1, 1).getDay();
-          for(let i =  lastDay; i <= 6; i++){
-            this.dates[this.dates.length-1][lastDay] = date.getMonth() == 11 ? { 'day' : dayAfter, 'month' : 0} : { 'day' : dayAfter, 'month' : date.getMonth()+1}
+          for(let i =  lastDay; i <= this.MAX_COLUMN_INDEX; i++){
+            this.dates[this.dates.length-1][lastDay] = date.getMonth() == this.MAX_MONTH_INDEX ? { 'day' : dayAfter, 'month' : 0} : { 'day' : dayAfter, 'month' : date.getMonth()+1}
             dayAfter++; 
             lastDay++;
           }
@@ -131,25 +151,31 @@ export default {
 
       let i = 0;
       let day = 1;
-      while(i < 5 && day <= lastDate.getDate()){
+      while(i < this.MAX_ROW_INDEX && day <= lastDate.getDate()){
         let selectedDay = new Date(date.getFullYear(), date.getMonth(), day).getDay();
 
         this.dates[i][selectedDay] = { 'day' : day, 'month' : date.getMonth()} 
         day = day + 1; 
-        if(selectedDay % 7 == 6) i++
+        if(selectedDay % 7 == this.MAX_COLUMN_INDEX) i++
 
       }
     },
-    showEvent(e){
-      console.log('EEE', e)
-      this.event = e
+    showEvent(event,index){
+      this.event = event
+      this.eventIndex = index
       this.showModal.viewEvent = true
       this.showModal.defaultModal = false
     },
     showMore(day){
       this.selectedMore = day
       this.showModal.defaultModal = true
-      console.log('this showmore' , this.selectedMore)
+    },
+    removeEvent(event, index){
+      if(event.startDate.day != event.endDate.day){
+        this.listEvent[event.endDate.day].splice(index, 1)
+      }
+      this.listEvent[event.startDate.day].splice(index, 1)
+      localStorage.setItem("listEvent", JSON.stringify(this.listEvent))
     }
   }
 };
@@ -171,10 +197,11 @@ export default {
   line-height: normal;
   display : inline-block;
 }
-.cal-header{
+.cal-header, .cal-header-phone{
   height: 30px;
   line-height: 30px;
   border-top : 1px solid black;
+  background-color: #42f4a4;
 }
 .cal-cell {
   height: 90px;

@@ -47,8 +47,11 @@
 
           <div class="modal-footer">
             <slot name="footer">
-              <button type="reset" class="btn btn-danger" @click="close">
+              <button type="reset" class="btn btn-grey" @click="close">
                 Close
+              </button>
+              <button type="button" class="btn btn-danger" @click="remove">
+                <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
             </slot>
           </div>
@@ -63,7 +66,8 @@ export default {
   name: "EventModal",
   props: {
     show : Boolean,
-    event : Object
+    event : Object,
+    eventIndex: Number
   },
   computed: {
 
@@ -88,6 +92,10 @@ export default {
     close() {
         this.$emit('close')       
     },
+    remove(){
+      this.$emit('remove', this.event, this.eventIndex)
+      this.close()
+    }
   }
 };
 </script>

@@ -89,6 +89,9 @@
 </template>
 
 <script>
+
+
+
 export default {
   name: "EventModal",
   props: {
@@ -106,8 +109,11 @@ export default {
       },
       times : [],
       dates: [],
-      months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       
+      //use constants
+      MAX_HOUR : 24,
+      MAX_MINUTE : 60      
     }
   },
   watch:{
@@ -128,8 +134,8 @@ export default {
   },
   methods: {
     setTime(){
-      for(let i = 0; i<24; i++){
-        for(let j = 0; j<60; j=j+30){
+      for(let i = 0; i < this.MAX_HOUR; i++){
+        for(let j = 0; j < this.MAX_MINUTE; j = j+30){
           this.times.push(this.formatTime(i, j))
         }
         
@@ -138,7 +144,6 @@ export default {
       let date = new Date();
       let lastDate = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate()
       for(let i = 1; i<= lastDate; i++){
-        // this.dates.push(this.months[date.getMonth()] + " " + i + ", " + date.getFullYear())
         this.dates.push({"year" : date.getFullYear(), "month": date.getMonth(), "day" : i})
       }
       this.form.startDate = { "year" : date.getFullYear(), "month" :  date.getMonth(), "day": date.getDate()};
